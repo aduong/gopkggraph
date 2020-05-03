@@ -22,6 +22,7 @@ Print the graph with defaults (as pairs, no filtering):
     flag -> strconv
     flag -> strings
     flag -> time
+    ...
 
 Print the graph in a tree-like format:
 
