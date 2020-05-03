@@ -35,9 +35,8 @@ func mainE() error {
 	if err != nil {
 		return err
 	}
-	pkg := flag.Arg(0)
-	if pkg == "" {
-		return errors.New("not enough args")
+	if flag.NArg() == 0 {
+		return errors.New("no packages specified")
 	}
 	var printer func(pkg, fromPkg string)
 	switch *format {
@@ -57,7 +56,10 @@ func mainE() error {
 			return pkgwalker.Continue
 		},
 	}
-	w.Walk(pkg)
+	for _, pkg := range flag.Args() {
+		w.Walk(pkg)
+
+	}
 	return nil
 }
 
@@ -137,7 +139,7 @@ func compose(ts ...OnPackageTransform) OnPackageTransform {
 }
 
 func printUsage(writer io.Writer) {
-	fmt.Fprint(writer, `Usage: gopkggraph PKG
+	fmt.Fprint(writer, `Usage: gopkggraph PKG...
 
 PKG is a package path like github.com/aduong/gopkggraph/pkg/pkgwalker
 `)
