@@ -59,8 +59,8 @@ func mainE() error {
 }
 
 func printUsage(writer io.Writer) {
-	fmt.Fprintf(writer, `Usage: %s PKG
+	fmt.Fprint(writer, `Usage: gopkggraph PKG
 
 PKG is a package path like github.com/aduong/gopkggraph/pkg/pkgwalker
-`, os.Args[0])
+`)
 }
