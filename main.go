@@ -43,7 +43,9 @@ func mainE() error {
 	case "pairs":
 		printer = pairsPrinter(" -> ")
 	case "treelike":
-		printer = treeLikePrinter()
+		tlp := newTreeLikePrinter()
+		defer tlp.Flush()
+		printer = tlp.Print
 	case "list":
 		printer = listPrinter()
 	default:
@@ -69,28 +71,39 @@ func listPrinter() func(pkg, fromPkg string) {
 	}
 }
 
-// treeLikePrinter prints in a format similiar to the tool `tree`.
+// treeLikePrinter prints in a format similar to the tool `tree`.
 // NB: relies on the fact that the walk is breadth-first.
-func treeLikePrinter() func(pkg, fromPkg string) {
-	lastFromPkg := ""
-	var pkgs []string
-	return func(pkg, fromPkg string) {
-		if fromPkg != lastFromPkg {
-			if lastFromPkg != "" {
-				fmt.Println(lastFromPkg)
-			}
-			for i, pkg := range pkgs {
-				if i != len(pkgs)-1 {
-					fmt.Printf("├─ %s\n", pkg)
-				} else {
-					fmt.Printf("└─ %s\n", pkg)
-				}
-			}
-			lastFromPkg = fromPkg
-			pkgs = pkgs[:0]
-		}
-		pkgs = append(pkgs, pkg)
+type treeLikePrinter struct {
+	lastFromPkg string
+	pkgs        []string
+}
+
+func newTreeLikePrinter() *treeLikePrinter {
+	return &treeLikePrinter{}
+}
+
+func (p *treeLikePrinter) Print(pkg, fromPkg string) {
+	if fromPkg != p.lastFromPkg {
+		p.Flush()
+		p.lastFromPkg = pkg
 	}
+	p.pkgs = append(p.pkgs, pkg)
+}
+
+func (p *treeLikePrinter) Flush() {
+	if len(p.pkgs) == 0 {
+		return
+	}
+	fmt.Println(p.lastFromPkg)
+	for i, pkg := range p.pkgs {
+		if i != len(p.pkgs)-1 {
+			fmt.Printf("├─ %s\n", pkg)
+		} else {
+			fmt.Printf("└─ %s\n", pkg)
+		}
+	}
+	p.lastFromPkg = ""
+	p.pkgs = p.pkgs[:0]
 }
 
 func pairsPrinter(sep string) func(pkg, fromPkg string) {
