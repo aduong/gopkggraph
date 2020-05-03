@@ -6,12 +6,14 @@ import (
 )
 
 type BreadthFirstWalker struct {
-	OnPackage func(pkg, fromPkg string) Next
+	OnPackage OnPackageFunc
 	OnErr     func(err error) Next
 
 	seen map[string]bool
 	q    []pair
 }
+
+type OnPackageFunc func(pkg, fromPkg string) Next
 
 type pair struct {
 	pkg     string
