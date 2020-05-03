@@ -50,7 +50,7 @@ func mainE() error {
 			return pkgwalker.Continue
 		},
 		OnErr: func(err error) pkgwalker.Next {
-			fmt.Fprint(os.Stderr, err)
+			fmt.Fprintln(os.Stderr, err)
 			return pkgwalker.Continue
 		},
 	}
