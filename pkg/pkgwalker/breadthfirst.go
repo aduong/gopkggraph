@@ -39,12 +39,12 @@ func (w *BreadthFirstWalker) walk() {
 		if pkg == "C" {
 			continue
 		}
-		if w.seen[pkg] {
-			continue
-		}
-		w.seen[pkg] = true
 		switch next := w.OnPackage(pkg, fromPkg); next {
 		case Continue:
+			if w.seen[pkg] {
+				continue
+			}
+			w.seen[pkg] = true
 			p, err := build.Import(pkg, "", 0)
 			if err != nil {
 				if w.OnErr != nil {
